@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.*;
 
 /**
  * Created by LaunchCode
@@ -65,24 +66,7 @@ public class JobData {
      * @param value Value of teh field to search for
      * @return List of all jobs matching the criteria
      */
-    public static ArrayList<HashMap<String, String>> findByColumnAndValue(String column, String value) {
 
-        // load data, if not already loaded
-        loadData();
-
-        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
-
-        for (HashMap<String, String> row : allJobs) {
-
-            String aValue = row.get(column);
-
-            if (aValue.contains(value)) {
-                jobs.add(row);
-            }
-        }
-
-        return jobs;
-    }
 
     /**
      * Read in data from a CSV file and store it in a list
@@ -124,5 +108,46 @@ public class JobData {
             e.printStackTrace();
         }
     }
+    public static ArrayList<HashMap<String, String>> findByColumnAndValue(String column, String value) {
+
+        // load data, if not already loaded
+        loadData();
+
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+
+        for (HashMap<String, String> row : allJobs) {
+
+            String aValue = row.get(column);
+
+            if ( Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE).matcher(aValue).find()) {
+                jobs.add(row);
+            }
+        }
+
+        return jobs;
+    }
+
+    public static ArrayList<HashMap<String, String>> findAllColumns(String value) {
+        loadData();
+
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+
+        for (HashMap<String, String> row : allJobs) {
+
+            ArrayList<String> keys = new ArrayList<>(row.keySet());
+            for (String column : keys) {
+                String aValue = row.get(column);
+                if (Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE).matcher(aValue).find()) {
+                    jobs.add(row);
+                    break;
+                }
+            }
+
+        }
+        return jobs;
+    }
+
+
+
 
 }
